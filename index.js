@@ -7,58 +7,30 @@ const getTweets = util.promisify(twitter.getTweets);
 
 app.use(express.static("./public"));
 
-// app.get("/tweets.json", (req, res) => {
-//     let numOfTweets = 0;
-//     let requestCounter = 0;
-//     const queryText = "%23IOT";
-//     getToken().then(token => {
-//         getTweets(
-//             token,
-//             `?q=${queryText}&lang=de&count=100&include_entities=false`
-//         )
-//             .then(tweets => {
-//                 if (tweets.statuses.length == 100 && requestCounter <= 10) {
-//                     numOfTweets += 100;
-//                     console.log(
-//                         "do another query to ",
-//                         tweets.search_metadata.next_results
-//                     );
-//                     requestCounter++;
-//                     console.log("req counter: ", requestCounter);
-//                     getTweets(token, tweets.search_metadata.next_results);
-//                 } else {
-//                     // console.log(tweets.statuses.length);
-//                     numOfTweets += tweets.statuses.length;
-//                     res.send("number of tweets: " + numOfTweets);
-//                 }
-//             })
-//             .catch(err => {
-//                 console.log(err);
-//                 res.sendStatus(500);
-//             });
-//     });
-// });
-
 app.get("/tweets.json", async (req, res) => {
     let numOfTweets = 0;
     let requestCounter = 0;
-    const queryText = "internetderdinge";
+    const queryText = "IOT";
     // const lang = "de";
     const firstQuery = `?q=${queryText}&count=100&include_entities=false&result_type=recent`;
+    let userIds = [];
 
     try {
         const token = await getToken();
 
         const oneHourAgo = date => {
-            const hour = 1000 * 60 * 60 * 24;
+            const hour = 1000 * 60 * 60;
             const hourago = Date.now() - hour;
             return date > hourago;
         };
         const parseTwitterDate = aDate => {
             return new Date(Date.parse(aDate.replace(/( \+)/, " UTC$1")));
         };
+
         const getRecurTweets = async queryString => {
             const tweets = await getTweets(token, queryString);
+            userIds.push(...tweets.statuses.map(status => status.user.id));
+            // console.log(userIds);
             const parsedTwitterDates = tweets.statuses.map(status =>
                 parseTwitterDate(status.created_at)
             );
@@ -77,7 +49,10 @@ app.get("/tweets.json", async (req, res) => {
                         numOfTweets++;
                     }
                 });
-                res.send("number of tweets: " + numOfTweets);
+                let uniqueUserIds = [...new Set(userIds)];
+                res.send(
+                    `Number of tweets: ${numOfTweets}. Number of unique users: ${uniqueUserIds.length}`
+                );
             }
         };
         getRecurTweets(firstQuery);
