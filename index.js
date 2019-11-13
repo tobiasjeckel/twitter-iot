@@ -42,27 +42,41 @@ app.use(express.static("./public"));
 app.get("/tweets.json", async (req, res) => {
     let numOfTweets = 0;
     let requestCounter = 0;
-    const queryText = "%23IOT";
-    const lang = "de";
-    const firstQuery = `?q=${queryText}&lang=${lang}&count=100&include_entities=false`;
+    const queryText = "internetderdinge";
+    // const lang = "de";
+    const firstQuery = `?q=${queryText}&count=100&include_entities=false&result_type=recent`;
 
     try {
         const token = await getToken();
-        // console.log(token);
+
+        const oneHourAgo = date => {
+            const hour = 1000 * 60 * 60 * 24;
+            const hourago = Date.now() - hour;
+            return date > hourago;
+        };
+        const parseTwitterDate = aDate => {
+            return new Date(Date.parse(aDate.replace(/( \+)/, " UTC$1")));
+        };
         const getRecurTweets = async queryString => {
             const tweets = await getTweets(token, queryString);
-            if (requestCounter <= 100 && tweets.statuses.length == 100) {
-                console.log(
-                    "another request to: ",
-                    tweets.search_metadata.next_results
-                );
+            const parsedTwitterDates = tweets.statuses.map(status =>
+                parseTwitterDate(status.created_at)
+            );
+            //limited to 20 requests, therefore maximum of 2000 tweets per second can be counted
+            if (
+                requestCounter < 20 &&
+                tweets.statuses.length == 100 &&
+                parsedTwitterDates.every(oneHourAgo)
+            ) {
                 requestCounter++;
-                numOfTweets += 10;
-                console.log("num of tweets: ", numOfTweets);
+                numOfTweets += 100;
                 getRecurTweets(tweets.search_metadata.next_results);
             } else {
-                console.log("finished");
-                numOfTweets += tweets.statuses.length;
+                parsedTwitterDates.forEach(date => {
+                    if (oneHourAgo(date)) {
+                        numOfTweets++;
+                    }
+                });
                 res.send("number of tweets: " + numOfTweets);
             }
         };
