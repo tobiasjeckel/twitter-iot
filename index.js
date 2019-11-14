@@ -7,13 +7,13 @@ const getTweets = util.promisify(twitter.getTweets);
 
 app.use(express.static("./public"));
 
-app.get("/tweets.json", async (req, res) => {
-    let numOfTweets = 0;
+app.get("/tweetslasthour", async (req, res) => {
     let requestCounter = 0;
     const queryText = "IOT";
     // const lang = "de";
     const firstQuery = `?q=${queryText}&count=100&include_entities=false&result_type=recent`;
-    let userIds = [];
+
+    let tweetsInLastHour = [];
 
     try {
         const token = await getToken();
@@ -29,33 +29,60 @@ app.get("/tweets.json", async (req, res) => {
 
         const getRecurTweets = async queryString => {
             const tweets = await getTweets(token, queryString);
-            userIds.push(...tweets.statuses.map(status => status.user.id));
-            // console.log(userIds);
             const parsedTwitterDates = tweets.statuses.map(status =>
                 parseTwitterDate(status.created_at)
             );
-            //limited to 20 requests, therefore maximum of 2000 tweets per second can be counted
+            //limited to 20 requests, therefore maximum of 2000 tweets per hour can be counted
             if (
                 requestCounter < 20 &&
                 tweets.statuses.length == 100 &&
                 parsedTwitterDates.every(oneHourAgo)
             ) {
                 requestCounter++;
-                numOfTweets += 100;
+                tweetsInLastHour.push(...tweets.statuses);
+                console.log("fetch more");
                 getRecurTweets(tweets.search_metadata.next_results);
             } else {
-                parsedTwitterDates.forEach(date => {
-                    if (oneHourAgo(date)) {
-                        numOfTweets++;
+                console.log("done");
+                tweets.statuses.forEach(status => {
+                    if (oneHourAgo(parseTwitterDate(status.created_at))) {
+                        tweetsInLastHour.push(status);
                     }
                 });
+
+                let userIds = tweetsInLastHour.map(status => status.user.id);
+                let tweetIds = tweetsInLastHour.map(status => status.id);
                 let uniqueUserIds = [...new Set(userIds)];
-                res.send(
-                    `Number of tweets: ${numOfTweets}. Number of unique users: ${uniqueUserIds.length}`
+                let uniqueTwitterIds = [...new Set(tweetIds)]; //make sure no duplicate tweets are sent
+
+                console.log(
+                    `tweets: ${tweetsInLastHour.length}, unique Users: ${uniqueUserIds.length}, unique Tweets: ${uniqueTwitterIds.length}`
                 );
+                console.log("first tweet: ", tweetsInLastHour[0].created_at);
+                console.log(
+                    "last tweet: ",
+                    tweetsInLastHour[tweetsInLastHour.length - 1].created_at
+                );
+                res.sendStatus(200);
             }
         };
         getRecurTweets(firstQuery);
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(400);
+    }
+});
+
+app.get("/populartweets", async (req, res) => {
+    //getting max 100 popular tweets is enough
+    const queryText = "IOT";
+    const query = `?q=${queryText}&count=100&include_entities=false&result_type=popular`;
+    // let populartweets = [];
+    try {
+        const token = await getToken();
+        const tweets = await getTweets(token, query);
+        console.log(tweets);
+        res.sendStatus(200);
     } catch (err) {
         console.log(err);
         res.sendStatus(400);
