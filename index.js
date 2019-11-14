@@ -4,13 +4,13 @@ const twitter = require("./twitter");
 const util = require("util");
 const getToken = util.promisify(twitter.getToken);
 const getTweets = util.promisify(twitter.getTweets);
+const getEmbed = util.promisify(twitter.getEmbed);
 
 app.use(express.static("./public"));
 
-app.get("/tweetslasthour", async (req, res) => {
+app.get("/api/tweetslasthour", async (req, res) => {
     let requestCounter = 0;
     const queryText = "IOT";
-    // const lang = "de";
     const firstQuery = `?q=${queryText}&count=100&include_entities=false&result_type=recent`;
 
     let tweetsInLastHour = [];
@@ -63,7 +63,13 @@ app.get("/tweetslasthour", async (req, res) => {
                     "last tweet: ",
                     tweetsInLastHour[tweetsInLastHour.length - 1].created_at
                 );
-                res.sendStatus(200);
+                // return uniqueTwitterIds.length, uniqueUserIds.lenght;
+                res.send(
+                    `<p>
+                        In the past hour there were ${uniqueTwitterIds.length} tweets from ${uniqueUserIds.length} unique
+                        users about <strong>IOT</strong>.
+                    </p>`
+                );
             }
         };
         getRecurTweets(firstQuery);
@@ -73,16 +79,19 @@ app.get("/tweetslasthour", async (req, res) => {
     }
 });
 
-app.get("/populartweets", async (req, res) => {
+app.get("/api/populartweets", async (req, res) => {
     //getting max 100 popular tweets is enough
     const queryText = "IOT";
     const query = `?q=${queryText}&count=100&include_entities=false&result_type=popular`;
-    // let populartweets = [];
     try {
         const token = await getToken();
         const tweets = await getTweets(token, query);
-        console.log(tweets);
-        res.sendStatus(200);
+        let tweetHtml = "";
+        for (let i = 0; i < tweets.statuses.length; i++) {
+            let chunk = await getEmbed(tweets.statuses[i]);
+            tweetHtml += chunk.html;
+        }
+        res.send(tweetHtml);
     } catch (err) {
         console.log(err);
         res.sendStatus(400);
