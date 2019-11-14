@@ -55,21 +55,10 @@ app.get("/api/tweetslasthour", async (req, res) => {
                 let uniqueUserIds = [...new Set(userIds)];
                 let uniqueTwitterIds = [...new Set(tweetIds)]; //make sure no duplicate tweets are sent
 
-                console.log(
-                    `tweets: ${tweetsInLastHour.length}, unique Users: ${uniqueUserIds.length}, unique Tweets: ${uniqueTwitterIds.length}`
-                );
-                console.log("first tweet: ", tweetsInLastHour[0].created_at);
-                console.log(
-                    "last tweet: ",
-                    tweetsInLastHour[tweetsInLastHour.length - 1].created_at
-                );
-                // return uniqueTwitterIds.length, uniqueUserIds.lenght;
-                res.send(
-                    `<p>
-                        In the past hour there were ${uniqueTwitterIds.length} tweets from ${uniqueUserIds.length} unique
-                        users about <strong>IOT</strong>.
-                    </p>`
-                );
+                res.json({
+                    numTweets: uniqueTwitterIds.length,
+                    numUsers: uniqueUserIds.length
+                });
             }
         };
         getRecurTweets(firstQuery);
