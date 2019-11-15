@@ -1,0 +1,29 @@
+{
+  "name": "twitter-iot",
+  "version": "1.0.0",
+  "description": "The goal of this project was to demonstrate my capability to create a node.js application that fetches data from the Twitter API.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "basic-auth": "^2.0.1",
+    "express": "^4.17.1",
+    "jsdoc": "^3.6.3",
+    "util": "^0.12.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobiasjeckel/twitter-iot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tobiasjeckel/twitter-iot/issues"
+  },
+  "homepage": "https://github.com/tobiasjeckel/twitter-iot#readme"
+}
