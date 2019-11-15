@@ -52,6 +52,12 @@ app.use(express.static("./public"));
  * @param {callback} middleware - Express middleware.
  * @param {object} res - json object with number of tweets and users
  */
+
+app.get("/", function(req, res) {
+    console.log("in slash route");
+    res.sendFile("./index.html");
+});
+
 app.get("/api/tweetslasthour", async (req, res) => {
     //counter to count the number of requests that have been made to the twitter API
     let requestCounter = 0;
