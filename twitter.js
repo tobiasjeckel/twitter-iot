@@ -85,7 +85,7 @@ exports.getEmbed = (tweet, callback) => {
     const params = {
         id: tweet.id_str,
         hide_thread: true,
-        omit_script: false
+        omit_script: true
     };
 
     const req = https.request(
