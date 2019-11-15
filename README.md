@@ -7,6 +7,16 @@ This app contacts the [Twitter Standard Search API](https://developer.twitter.co
 -   It collects and displays the most popular tweets of the past **7 days** regarding the topic **IOT**
 -   It calculates and displays **how many tweets** were published by **how many users** in the past **hour**
 
+## Preview
+
+Inline-style:
+![Preview of Twitter IOT App](https://github.com/tobiasjeckel/twitter-iot/tree/master/public/IOT-Twitter-Preview.png "Preview of Twitter IOT App")
+
+The site is live on:
+https://iot-twitter-scanner.herokuapp.com/
+
+Because I am using the free Twitter Search API, too many requests will quickly break the site. It is therefore secured with BasicAuth. Please send me message for the credentials so you can have have a look 😊. The load times are also quite slow as the free version of the Heroku app needs come awake first.
+
 ## Installation instructions to install on a local machine
 
 -   Clone the repo to your local machine
