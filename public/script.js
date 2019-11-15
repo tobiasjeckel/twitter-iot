@@ -3,7 +3,7 @@ const fetchStats = () => {
         console.log(res.data);
         document.getElementById(
             "tweetstats"
-        ).innerHTML = `In the past hour, ${res.data.numTweets} tweets were published from ${res.data.numUsers} unique users about the topic <strong>'IOT'</strong>.`;
+        ).innerHTML = `In the past hour, <strong>${res.data.numTweets}</strong> tweets were published from <strong>${res.data.numUsers}</strong> unique users about the topic <strong>'IOT'</strong>.`;
     });
 };
 

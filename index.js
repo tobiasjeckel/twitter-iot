@@ -163,4 +163,6 @@ app.get("/api/populartweets", async (req, res) => {
     }
 });
 
-app.listen(8080, () => console.log("server is listening"));
+app.listen(process.env.PORT || 8080, () => {
+    console.log("server is running");
+});
