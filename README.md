@@ -9,8 +9,7 @@ This app contacts the [Twitter Standard Search API](https://developer.twitter.co
 
 ## Preview
 
-Inline-style:
-![Preview of Twitter IOT App](https://github.com/tobiasjeckel/twitter-iot/tree/master/public/IOT-Twitter-Preview.png "Preview of Twitter IOT App")
+![Preview of Twitter IOT App](https://raw.githubusercontent.com/tobiasjeckel/twitter-iot/master/public/IOT-Twitter-Preview.png)
 
 The site is live on:
 https://iot-twitter-scanner.herokuapp.com/
