@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "basic-auth": "^2.0.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "jsdoc": "^3.6.3",
     "util": "^0.12.1"
   },
